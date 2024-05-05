@@ -1,0 +1,144 @@
+CREATE TABLE Maker
+( 
+	ID_Maker             integer  NOT NULL ,
+	NameMaker            varchar(50)  NULL ,
+	CONSTRAINT XPKMaker PRIMARY KEY  CLUSTERED (ID_Maker ASC)
+)
+go
+
+CREATE TABLE Fabric
+( 
+	ID_Fabric            integer identity(1,1)  NOT NULL ,
+	Type                 varchar(20)  NULL ,
+	NameFabric           varchar(20)  NULL ,
+	CostForMeter         decimal(10,2)  NULL ,
+	CONSTRAINT XPKFabric PRIMARY KEY  CLUSTERED (ID_Fabric ASC)
+)
+go
+
+CREATE TABLE Arrival
+( 
+	ID_Maker             int  NOT NULL ,
+	ID_Fabric            int  NOT NULL ,
+	ID_Arrival           integer  NOT NULL ,
+	Quantity             decimal(10,2)  NULL ,
+	DataArrival          datetime  NULL ,
+	CONSTRAINT XPKArrival PRIMARY KEY  CLUSTERED (ID_Arrival ASC,ID_Maker ASC,ID_Fabric ASC),
+	CONSTRAINT R_22 FOREIGN KEY (ID_Maker) REFERENCES Maker(ID_Maker)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	CONSTRAINT R_23 FOREIGN KEY (ID_Fabric) REFERENCES Fabric(ID_Fabric)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+)
+go
+
+CREATE TABLE Sewer
+( 
+	ID_Sewer             integer identity(1,1) NOT NULL ,
+	NameSewer            varchar(50)  NULL ,
+	Payment              decimal(10,2)  NULL ,
+	Qualification        varchar(20)  NULL ,
+	Workload             int  NULL ,
+	CONSTRAINT XPKВиконавець PRIMARY KEY  CLUSTERED (ID_Sewer ASC)
+)
+go
+
+ALTER TABLE Sewer
+	 WITH CHECK ADD CONSTRAINT Qual_ CHECK  ( [Qualification]='Trainee' OR [Qualification]='Full' OR [Qualification]='Pro' )
+go
+
+ALTER TABLE Sewer
+	 WITH CHECK ADD CONSTRAINT Work_ CHECK  ( Workload BETWEEN 0 AND 10 )
+go
+
+CREATE TABLE Client
+( 
+	ID_Client            integer identity(1,1) NOT NULL ,
+	NameClient           varchar(50)  NULL ,
+	AddressClient        varchar(50)  NULL ,
+	NumClient            varchar(13)  NULL ,
+	Size                 int  NOT NULL ,
+	CONSTRAINT XPKClient PRIMARY KEY  CLUSTERED (ID_Client ASC)
+)
+go
+
+ALTER TABLE Client
+	 WITH CHECK ADD CONSTRAINT SizeValues_ CHECK  ( [Size]=1 OR [Size]=2 OR [Size]=3 )
+go
+
+CREATE TABLE Model
+( 
+	ExpenseFabric        decimal(10,2)  NULL ,
+	ID_Model             integer identity(1,1)  NOT NULL ,
+	PlanTime             int  NULL ,
+	CostModel            decimal(10,2)  NULL ,
+	AdditionalCost       decimal(10,2)  NULL ,
+	CONSTRAINT XPKModel PRIMARY KEY  CLUSTERED (ID_Model ASC)
+)
+go
+
+CREATE TABLE Recommend
+( 
+	ID_Fabric            integer  NOT NULL ,
+	ID_Model             int  NOT NULL ,
+	ExpenseForModel      decimal(10,2)  NULL ,
+	CONSTRAINT XPKRecommend PRIMARY KEY  CLUSTERED (ID_Fabric ASC,ID_Model ASC),
+	CONSTRAINT R_19 FOREIGN KEY (ID_Fabric) REFERENCES Fabric(ID_Fabric)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	CONSTRAINT R_20 FOREIGN KEY (ID_Model) REFERENCES Model(ID_Model)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+)
+go
+
+CREATE TABLE Orderr
+( 
+	ID_Order             integer identity(1,1)  NOT NULL ,
+	DataTake             datetime  NULL ,
+	DataDoPlan           datetime  NULL ,
+	ReadyMark            bit  NULL ,
+	ID_Sewer             integer  NULL ,
+	ID_Client            integer  NOT NULL ,
+	DataDoReal           datetime  NULL ,
+	ID_Fabric            integer  NULL ,
+	ID_Model             int  NULL ,
+	CostOrder            money  NULL ,
+	CostFabric           money  NULL ,
+	ExpenseFabricReal    decimal(10,2)  NULL ,
+	CONSTRAINT XPKOrder PRIMARY KEY  CLUSTERED (ID_Order ASC),
+	CONSTRAINT R_11 FOREIGN KEY (ID_Sewer) REFERENCES Sewer(ID_Sewer)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	CONSTRAINT R_12 FOREIGN KEY (ID_Client) REFERENCES Client(ID_Client)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	CONSTRAINT R_21 FOREIGN KEY (ID_Fabric,ID_Model) REFERENCES Recommend(ID_Fabric,ID_Model)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+)
+go
+
+CREATE TABLE Photo
+( 
+	ID_Model             integer identity(1,1)  NULL ,
+	ID_Photo             integer  NOT NULL ,
+	Link                 image  NULL ,
+	CONSTRAINT XPKPhoto PRIMARY KEY  CLUSTERED (ID_Photo ASC),
+	CONSTRAINT R_24 FOREIGN KEY (ID_Model) REFERENCES Model(ID_Model)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+)
+go
+
+CREATE TABLE Warehouse
+( 
+	ID_Fabric            integer  NOT NULL ,
+	Remains              decimal(10,2)  NULL ,
+	CONSTRAINT XPKСWare PRIMARY KEY  CLUSTERED (ID_Fabric ASC),
+	CONSTRAINT R_15 FOREIGN KEY (ID_Fabric) REFERENCES Fabric(ID_Fabric)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+)
+go
